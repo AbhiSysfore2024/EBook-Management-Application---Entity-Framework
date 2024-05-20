@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace Entities
 {
@@ -15,5 +16,20 @@ namespace Entities
 
         public List<BookAuthor> BookAuthor { get; set; }
 
+        public AuthorModel()
+        {
+
+        }
+
+        public AuthorModel(DTOAuthor author)
+        {
+            CreatedAt = DateTime.Now;
+            UpdatedAt = DateTime.Now;
+            AuthorID = Guid.NewGuid();
+            this.Name = (AuthorName)author.Name;
+            this.Biography = author.Biography;
+            this.BirthDate = author.BirthDate;
+            this.Country = author.Country;
+        }
     }
 }
