@@ -17,6 +17,7 @@ namespace Entities
 
     public class UpdateAuthorModel
     {
+        public Guid AuthorID { get; set; }
         public AuthorName Name { get; set; }
         public string Biography { get; set; }
         public DateTime BirthDate { get; set; }

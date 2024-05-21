@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Entities
 {
@@ -16,9 +17,10 @@ namespace Entities
         [Column(Order = 1)]
         public Guid AuthorId { get; set; }
 
+        [JsonIgnore]
         public virtual BookModel Book { get; set; }
 
+        [JsonIgnore]
         public virtual AuthorModel Author { get; set; }
     }
-
 }

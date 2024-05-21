@@ -24,6 +24,29 @@ namespace Entities
         public DateTime? UpdatedAt { get; set; } = null;
         public int BookGenre { get; set; }
         public bool IsAvailable { get; set; }
-        public List<BookAuthor> BookAuthor { get; set; }
+        public List<AuthorModel> AuthorModel { get; set; }
+
+        public BookModel()
+        {
+
+        }
+
+        public BookModel(DTOBooks books)
+        {
+            IsAvailable = true;
+            BookID = Guid.NewGuid();
+            CreatedAt = DateTime.Now;
+            this.Title = books.Title;
+            this.Description = books.Description;
+            this.ISBN = books.ISBN;
+            this.Publication_Date = books.Publication_Date;
+            this.Price = books.Price;
+            this.Language = books.Language;
+            this.Publisher = books.Publisher;
+            this.PageCount = books.PageCount;
+            this.AvgRating = books.AvgRating;
+            this.BookGenre = books.BookGenre;
+            UpdatedAt = DateTime.Now;
+        }
     }
 }

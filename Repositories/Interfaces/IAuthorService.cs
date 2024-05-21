@@ -12,7 +12,7 @@ namespace Repositories.Interfaces
         List<AuthorModel> GetAllAuthors();
         AuthorModel AddAuthor(DTOAuthor author);
         AuthorModel GetAuthorByID(Guid id);
-        string UpdateAuthor(Guid authorID, UpdateAuthorModel author);
+        string UpdateAuthor(UpdateAuthorModel author);
         string DeleteAuthor(Guid id);
     }
 }
