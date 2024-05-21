@@ -40,5 +40,51 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
         {
             return Ok(_authorService.AddAuthor(DTOauthor));
         }
+
+        [HttpPut]
+        [Route("Update Author")]
+        public ActionResult UpdateAuthor(Guid authorID, [FromBody] UpdateAuthorModel author)
+        {
+            try
+            {
+                var updateAuthor = _authorService.UpdateAuthor(authorID, author);
+
+                if (updateAuthor == "Author updated successfully")
+                {
+                    return Ok(updateAuthor);
+                }
+                else
+                {
+                    return BadRequest(updateAuthor);
+                }
+            }
+            catch
+            {
+                return BadRequest("An error occurred while trying to update author");
+            }
+        }
+
+        [HttpDelete]
+        [Route("Delete Author")]
+        public ActionResult DeleteAuthor(Guid authorID)
+        {
+            try
+            {
+                var deleteAuthor = _authorService.DeleteAuthor(authorID);
+
+                if(deleteAuthor == "Author successfully deleted")
+                {
+                    return Ok(deleteAuthor);
+                }
+                else
+                {
+                    return BadRequest(deleteAuthor);
+                }
+            }
+            catch
+            {
+                return BadRequest("An error occurred while trying to update author");
+            }
+        }
     }
 }
