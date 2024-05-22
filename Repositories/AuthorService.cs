@@ -13,31 +13,31 @@ namespace Repositories
         {
             _dbContext = dbContext;
         }
-        public List<AuthorModel> GetAllAuthors()
+        public List<Author> GetAllAuthors()
         {
             return _dbContext.EFCAuthor.ToList();
         }
 
-        public AuthorModel AddAuthor(DTOAuthor DTOauthor)
+        public Author AddAuthor(DTOAuthor DTOauthor)
         {
-            AuthorModel author = new AuthorModel(DTOauthor);
+            Author author = new Author(DTOauthor);
             var addAuthor = _dbContext.EFCAuthor.Add(author);
             _dbContext.SaveChanges();
             return addAuthor.Entity;
         }
 
-        public AuthorModel GetAuthorByID(Guid id)
+        public Author GetAuthorByID(Guid id)
         {
             return _dbContext.EFCAuthor.FirstOrDefault(author => author.AuthorID == id);
         }
 
-        public string UpdateAuthor(UpdateAuthorModel author)
+        public string UpdateAuthor(Guid authorID, UpdateAuthorModel author)
         {
             try
             {
-                var updateAuthor = _dbContext.EFCAuthor.Find(author.AuthorID);
+                var updateAuthor = _dbContext.EFCAuthor.FirstOrDefault(auth => auth.AuthorID == authorID);
 
-                if (updateAuthor != null)
+                if (updateAuthor == null)
                 {
                     throw new AuthorNotFound("Author not found, please enter valid author ID");
                 }
@@ -68,7 +68,7 @@ namespace Repositories
             {
                 var deleteAuthor = _dbContext.EFCAuthor.Find(authorID);
 
-                if (deleteAuthor != null)
+                if (deleteAuthor == null)
                 {
                     throw new AuthorNotFound("Author not found, please enter valid author ID");
                 }

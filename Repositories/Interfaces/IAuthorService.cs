@@ -9,10 +9,10 @@ namespace Repositories.Interfaces
 {
     public interface IAuthorService
     {
-        List<AuthorModel> GetAllAuthors();
-        AuthorModel AddAuthor(DTOAuthor author);
-        AuthorModel GetAuthorByID(Guid id);
-        string UpdateAuthor(UpdateAuthorModel author);
+        List<Author> GetAllAuthors();
+        Author AddAuthor(DTOAuthor author);
+        Author GetAuthorByID(Guid id);
+        string UpdateAuthor(Guid authorID, UpdateAuthorModel author);
         string DeleteAuthor(Guid id);
     }
 }
