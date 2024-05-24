@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ebook.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialmigration : Migration
+    public partial class initialmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,33 @@ namespace Ebook.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EFCAuthor", x => x.AuthorID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EFCCredentials",
+                columns: table => new
+                {
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PassWord = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EFCGenre",
+                columns: table => new
+                {
+                    GenreId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GenreName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EFCGenre", x => x.GenreId);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,48 +78,47 @@ namespace Ebook.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EFCBooks", x => x.BookID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EFCCredentials",
-                columns: table => new
-                {
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PassWord = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
+                    table.ForeignKey(
+                        name: "FK_EFCBooks_EFCGenre_BookGenre",
+                        column: x => x.BookGenre,
+                        principalTable: "EFCGenre",
+                        principalColumn: "GenreId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "EFCBookAuthor",
                 columns: table => new
                 {
-                    BookId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AuthorID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BookID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EFCBookAuthor", x => new { x.BookId, x.AuthorId });
+                    table.PrimaryKey("PK_EFCBookAuthor", x => new { x.AuthorID, x.BookID });
                     table.ForeignKey(
-                        name: "FK_EFCBookAuthor_EFCAuthor_AuthorId",
-                        column: x => x.AuthorId,
+                        name: "FK_EFCBookAuthor_EFCAuthor_AuthorID",
+                        column: x => x.AuthorID,
                         principalTable: "EFCAuthor",
                         principalColumn: "AuthorID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EFCBookAuthor_EFCBooks_BookId",
-                        column: x => x.BookId,
+                        name: "FK_EFCBookAuthor_EFCBooks_BookID",
+                        column: x => x.BookID,
                         principalTable: "EFCBooks",
                         principalColumn: "BookID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_EFCBookAuthor_AuthorId",
+                name: "IX_EFCBookAuthor_BookID",
                 table: "EFCBookAuthor",
-                column: "AuthorId");
+                column: "BookID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EFCBooks_BookGenre",
+                table: "EFCBooks",
+                column: "BookGenre");
         }
 
         /// <inheritdoc />
@@ -109,6 +135,9 @@ namespace Ebook.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "EFCBooks");
+
+            migrationBuilder.DropTable(
+                name: "EFCGenre");
         }
     }
 }

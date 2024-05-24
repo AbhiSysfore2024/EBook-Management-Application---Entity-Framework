@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebook.Data.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240522074155_second")]
-    partial class second
+    [Migration("20240523174033_initial-migration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -119,7 +119,32 @@ namespace Ebook.Data.Migrations
 
                     b.HasKey("BookID");
 
+                    b.HasIndex("BookGenre");
+
                     b.ToTable("EFCBooks");
+                });
+
+            modelBuilder.Entity("Entities.Genre", b =>
+                {
+                    b.Property<int>("GenreId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenreId"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GenreName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("GenreId");
+
+                    b.ToTable("EFCGenre");
                 });
 
             modelBuilder.Entity("Entities.LoginRequest", b =>
@@ -178,6 +203,22 @@ namespace Ebook.Data.Migrations
 
                     b.Navigation("Name")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Entities.Book", b =>
+                {
+                    b.HasOne("Entities.Genre", "Genre")
+                        .WithMany("Book")
+                        .HasForeignKey("BookGenre")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
+                });
+
+            modelBuilder.Entity("Entities.Genre", b =>
+                {
+                    b.Navigation("Book");
                 });
 #pragma warning restore 612, 618
         }

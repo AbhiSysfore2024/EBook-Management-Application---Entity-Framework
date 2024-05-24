@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebook.Data.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240517101915_Initial migration")]
-    partial class Initialmigration
+    [Migration("20240524062550_second-migration")]
+    partial class secondmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,22 @@ namespace Ebook.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Entities.AuthorModel", b =>
+            modelBuilder.Entity("EFCBookAuthor", b =>
+                {
+                    b.Property<Guid>("AuthorID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AuthorID", "BookID");
+
+                    b.HasIndex("BookID");
+
+                    b.ToTable("EFCBookAuthor");
+                });
+
+            modelBuilder.Entity("Entities.Author", b =>
                 {
                     b.Property<Guid>("AuthorID")
                         .ValueGeneratedOnAdd()
@@ -53,24 +68,7 @@ namespace Ebook.Data.Migrations
                     b.ToTable("EFCAuthor");
                 });
 
-            modelBuilder.Entity("Entities.BookAuthor", b =>
-                {
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(1);
-
-                    b.HasKey("BookId", "AuthorId");
-
-                    b.HasIndex("AuthorId");
-
-                    b.ToTable("EFCBookAuthor");
-                });
-
-            modelBuilder.Entity("Entities.BookModel", b =>
+            modelBuilder.Entity("Entities.Book", b =>
                 {
                     b.Property<Guid>("BookID")
                         .ValueGeneratedOnAdd()
@@ -121,7 +119,32 @@ namespace Ebook.Data.Migrations
 
                     b.HasKey("BookID");
 
+                    b.HasIndex("BookGenre");
+
                     b.ToTable("EFCBooks");
+                });
+
+            modelBuilder.Entity("Entities.Genre", b =>
+                {
+                    b.Property<int>("GenreId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenreId"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GenreName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("GenreId");
+
+                    b.ToTable("EFCGenre");
                 });
 
             modelBuilder.Entity("Entities.LoginRequest", b =>
@@ -140,11 +163,26 @@ namespace Ebook.Data.Migrations
                     b.ToTable("EFCCredentials");
                 });
 
-            modelBuilder.Entity("Entities.AuthorModel", b =>
+            modelBuilder.Entity("EFCBookAuthor", b =>
+                {
+                    b.HasOne("Entities.Author", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BookID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Entities.Author", b =>
                 {
                     b.OwnsOne("Entities.AuthorName", "Name", b1 =>
                         {
-                            b1.Property<Guid>("AuthorModelAuthorID")
+                            b1.Property<Guid>("AuthorID")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("FirstName")
@@ -155,45 +193,32 @@ namespace Ebook.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.HasKey("AuthorModelAuthorID");
+                            b1.HasKey("AuthorID");
 
                             b1.ToTable("EFCAuthor");
 
                             b1.WithOwner()
-                                .HasForeignKey("AuthorModelAuthorID");
+                                .HasForeignKey("AuthorID");
                         });
 
                     b.Navigation("Name")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Entities.BookAuthor", b =>
+            modelBuilder.Entity("Entities.Book", b =>
                 {
-                    b.HasOne("Entities.AuthorModel", "Author")
-                        .WithMany("BookAuthor")
-                        .HasForeignKey("AuthorId")
+                    b.HasOne("Entities.Genre", "Genre")
+                        .WithMany("Book")
+                        .HasForeignKey("BookGenre")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entities.BookModel", "Book")
-                        .WithMany("BookAuthor")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Genre");
+                });
 
-                    b.Navigation("Author");
-
+            modelBuilder.Entity("Entities.Genre", b =>
+                {
                     b.Navigation("Book");
-                });
-
-            modelBuilder.Entity("Entities.AuthorModel", b =>
-                {
-                    b.Navigation("BookAuthor");
-                });
-
-            modelBuilder.Entity("Entities.BookModel", b =>
-                {
-                    b.Navigation("BookAuthor");
                 });
 #pragma warning restore 612, 618
         }
