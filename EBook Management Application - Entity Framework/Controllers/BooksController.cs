@@ -1,6 +1,7 @@
 ﻿using Ebook.Data;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Repositories;
 using Repositories.Interfaces;
 
 namespace EBook_Management_Application___Entity_Framework.Controllers
@@ -45,6 +46,52 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
         public ActionResult GetBooksByTitle(string title)
         {
             return Ok(_bookService.GetBooksByTitle(title));
+        }
+
+        [HttpPut]
+        [Route("Update Book")]
+        public ActionResult UpdateBook(Guid bookID, [FromBody] UpdateBookModel book)
+        {
+            try
+            {
+                var updateBook = _bookService.UpdateBook(bookID, book);
+
+                if (updateBook == "Book updated successfully")
+                {
+                    return Ok(updateBook);
+                }
+                else
+                {
+                    return BadRequest(updateBook);
+                }
+            }
+            catch
+            {
+                return BadRequest("An error occurred while trying to update author");
+            }
+        }
+
+        [HttpDelete]
+        [Route("Delete Book")]
+        public ActionResult DeleteBook(Guid bookID)
+        {
+            try
+            {
+                var deleteBook = _bookService.DeleteBook(bookID);
+
+                if (deleteBook == "Book successfully deleted")
+                {
+                    return Ok(deleteBook);
+                }
+                else
+                {
+                    return BadRequest(deleteBook);
+                }
+            }
+            catch
+            {
+                return BadRequest("An error occurred while trying to update book");
+            }
         }
     }
 }

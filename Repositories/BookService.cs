@@ -18,7 +18,7 @@ namespace Repositories
         }
         public List<Book> GetAllBooks()
         {
-            return _dbContext.EFCBooks.ToList();
+            return _dbContext.EFCBooks.Include(author => author.Author).Include(genre => genre.Genre).ToList();
         }
 
         public string AddBook(DTOBooks DTObook)
@@ -52,12 +52,13 @@ namespace Repositories
         {
             try
             {
-                var updateBook = _dbContext.EFCBooks.Find(bookID);
+                var updateBook = _dbContext.EFCBooks.Include(b => b.Author).FirstOrDefault(b => b.BookID == bookID);
 
-                if (updateBook != null)
+                if (updateBook == null)
                 {
                     throw new BookNotFound("Book not found, please enter valid book ID");
                 }
+
                 updateBook.Title = book.Title;
                 updateBook.Description = book.Description;
                 updateBook.ISBN = book.ISBN;
@@ -71,11 +72,13 @@ namespace Repositories
                 updateBook.IsAvailable = book.IsAvailable;
                 updateBook.UpdatedAt = DateTime.Now;
 
-               // updateBook.BookAuthor.Clear();
+               updateBook.Author.Clear();
 
-                foreach (var authorID in book.AuthorID)
+                var existingAuthors = _dbContext.EFCAuthor.Where(a=> book.AuthorID.Contains(a.AuthorID)).ToList();
+
+                foreach (var author in existingAuthors)
                 {
-                    var author = _dbContext.EFCBooks.Find(authorID);
+                    updateBook.Author.Add(author);
                 }
 
                 _dbContext.SaveChanges();
@@ -96,11 +99,11 @@ namespace Repositories
         {
             try
             {
-                var deleteBook = _dbContext.EFCBooks.Find(bookID);
+                var deleteBook = _dbContext.EFCBooks.Include(b => b.Author).FirstOrDefault(b => b.BookID == bookID);
 
-                if (deleteBook != null)
+                if (deleteBook == null)
                 {
-                    throw new BookNotFound("Book not found, please enter valid author ID");
+                    throw new BookNotFound("Book not found, please enter valid book ID");
                 }
 
                 _dbContext.EFCBooks.Remove(deleteBook);
@@ -122,7 +125,7 @@ namespace Repositories
         {
             try
             {
-                var books = _dbContext.EFCBooks.Where(book => book.Title.Contains(title)).ToList();
+                var books = _dbContext.EFCBooks.Include(b => b.Author).Where(b => b.Title == title).ToList();
 
                 return books;
             }
