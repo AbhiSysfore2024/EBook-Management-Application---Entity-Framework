@@ -10,6 +10,11 @@ namespace Ebook.Data
             
         }
 
+        public DbSet<LoginRequest> EFCCredentials { get; set; }
+        public DbSet<Author> EFCAuthor { get; set; }
+        public DbSet<Book> EFCBooks { get; set; }
+        public DbSet<Genre> EFCGenre { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Author>()
@@ -24,11 +29,15 @@ namespace Ebook.Data
                     l => l.HasOne(typeof(Book)).WithMany().HasForeignKey("BookID").HasPrincipalKey(nameof(Book.BookID)),
                     j => j.HasKey("AuthorID", "BookID"));
 
+            modelBuilder.Entity<Book>()
+            .HasOne(book => book.Genre)
+            .WithMany(g => g.Book)
+            .HasForeignKey(b => b.BookGenre);
+
+            modelBuilder.Entity<Genre>().HasKey(genre => genre.GenreId);
+            modelBuilder.Entity<LoginRequest>().HasKey(user => user.UserId);
+
             base.OnModelCreating(modelBuilder);
         }
-
-        public DbSet<LoginRequest> EFCCredentials { get; set; }
-        public DbSet<Author> EFCAuthor { get; set; }
-        public DbSet<Book> EFCBooks { get; set; }
     }
 }
