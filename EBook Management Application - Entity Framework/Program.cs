@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AuthenticationExtensions(builder.Configuration);
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServerManagementStudio")));
 builder.Services.Configure<JWTClaimDetails>(builder.Configuration.GetSection("Jwt"));
 builder.Services.SingletonService();
