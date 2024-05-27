@@ -18,6 +18,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             _authorService = authorService;
         }
 
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
         [Route("GetAllAuthors")]
         public ActionResult GetAllAuthors()
@@ -26,6 +27,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             return Ok(allAuthors);
         }
 
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
         [Route("GetAuthorByID")]
         public ActionResult GetAuthorsByID(Guid id)
@@ -34,6 +36,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             return Ok(author);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddAuthor")]
         public ActionResult AddNewAuthor([FromBody] DTOAuthor DTOauthor)
@@ -41,6 +44,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             return Ok(_authorService.AddAuthor(DTOauthor));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("Update Author")]
         public ActionResult UpdateAuthor(Guid authorID, [FromBody] UpdateAuthorModel author)
@@ -64,6 +68,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("Delete Author")]
         public ActionResult DeleteAuthor(Guid authorID)

@@ -48,7 +48,7 @@ namespace Repositories
                 {
                     UserName = loginRequest.UserName,
                     PassWord = passwordHash,
-                    Role = Role.User
+                    Role = Role.Admin
                 };
 
                 _dbContext.EFCCredentials.Add(user);
@@ -79,7 +79,7 @@ namespace Repositories
 
                 if (hashedPassword != null && BCrypt.Net.BCrypt.EnhancedVerify(loginRequest.PassWord, hashedPassword))
                 {
-                    var role = _dbContext.EFCCredentials.Where(user => user.UserName == loginRequest.UserName).Select(user => user.UserId).FirstOrDefault();
+                    var role = _dbContext.EFCCredentials.Where(user => user.UserName == loginRequest.UserName).Select(user => user.Role).FirstOrDefault();
 
                     roleName = Enum.GetName(typeof(Role), role);
                 }

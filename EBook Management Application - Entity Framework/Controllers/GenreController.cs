@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Repositories.Interfaces;
@@ -17,6 +18,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             _genreService = genreService;
         }
 
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
         [Route("GetAllGenres")]
         public ActionResult GetAllGenres()
@@ -25,6 +27,7 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
             return Ok(allGenres);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddGenre")]
         public ActionResult AddGenre(string genreName)
