@@ -24,5 +24,29 @@ namespace EBook_Management_Application___Entity_Framework.Controllers
         {
             return Ok(_authenticateAndAuthorizeService.Signup(loginRequest));
         }
+
+        [HttpPost]
+        [Route("Role")]
+        public ActionResult Role([FromBody] DTOLoginRequest dTOLoginRequest)
+        {
+            return Ok(_authenticateAndAuthorizeService.RoleAssigned(dTOLoginRequest));
+        }
+
+        [HttpPost]
+        [Route("Authentication")]
+        public ActionResult GenerateJwtToken([FromBody] DTOLoginRequest loginRequest)
+        {
+            try
+            {
+                string role = _authenticateAndAuthorizeService.RoleAssigned(loginRequest);
+                var jwtToken = _authenticateAndAuthorizeService.GenerateJwtToken(loginRequest, role);
+
+                return Ok(jwtToken);
+            }
+            catch
+            {
+                return BadRequest("An error occurred in generating the token");
+            }
+        }
     }
 }

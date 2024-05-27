@@ -1,6 +1,7 @@
 ﻿using CustomExceptions;
 using Ebook.Data;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Interfaces;
 
 namespace Repositories
@@ -28,7 +29,20 @@ namespace Repositories
 
         public Author GetAuthorByID(Guid id)
         {
-            return _dbContext.EFCAuthor.FirstOrDefault(author => author.AuthorID == id);
+            var getAuthorByID = _dbContext.EFCAuthor.Include(book => book.Book).FirstOrDefault(author => author.AuthorID == id);
+
+            if (getAuthorByID == null)
+            {
+                throw new AuthorNotFound("Author not found, please enter valid author ID");
+            }
+
+            var books = getAuthorByID.Book.Select(book => new
+            {
+                BookID = book.BookID,
+                BookName = book.Title
+            }).ToList();
+
+            return getAuthorByID;
         }
 
         public string UpdateAuthor(Guid authorID, UpdateAuthorModel author)

@@ -45,7 +45,7 @@ namespace Repositories
 
         public Book GetBookByID(Guid id)
         {
-            return _dbContext.EFCBooks.FirstOrDefault(book => book.BookID == id);
+            return _dbContext.EFCBooks.Include(author => author.Author).Include(genre => genre.Genre).FirstOrDefault(book => book.BookID == id);
         }
 
         public string UpdateBook(Guid bookID, UpdateBookModel book)

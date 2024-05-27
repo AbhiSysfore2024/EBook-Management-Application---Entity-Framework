@@ -1,17 +1,25 @@
-﻿using CustomExceptions;
+﻿using AppSettings;
+using CustomExceptions;
 using Ebook.Data;
 using Entities;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Repositories.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Repositories
 {
     public class AuthenticateAndAuthorize : IAuthenticateAndAuthorize
     {
         private readonly ApplicationDBContext _dbContext;
+        private readonly JWTClaimDetails _jwtDetails;
 
-        public AuthenticateAndAuthorize(ApplicationDBContext dbContext)
+        public AuthenticateAndAuthorize(ApplicationDBContext dbContext, IOptions<JWTClaimDetails> jwtDetails)
         {
             _dbContext = dbContext;
+            _jwtDetails = jwtDetails.Value;
         }
 
         public string Signup(DTOLoginRequest loginRequest)
@@ -63,7 +71,7 @@ namespace Repositories
 
         public string RoleAssigned(DTOLoginRequest loginRequest)
         {
-            string role = "";
+            string roleName = "";
             string hashedPassword = "";
             try
             {
@@ -71,16 +79,47 @@ namespace Repositories
 
                 if (hashedPassword != null && BCrypt.Net.BCrypt.EnhancedVerify(loginRequest.PassWord, hashedPassword))
                 {
-                    role = _dbContext.EFCCredentials.Where(user => user.UserName == loginRequest.UserName).Select(user => user.UserId).FirstOrDefault().ToString(role);
+                    var role = _dbContext.EFCCredentials.Where(user => user.UserName == loginRequest.UserName).Select(user => user.UserId).FirstOrDefault();
+
+                    roleName = Enum.GetName(typeof(Role), role);
                 }
 
-                return role;
+                return roleName;
             }
             catch (Exception e)
             {
                 return e.Message;
             }
+        }
 
+        public string GenerateJwtToken(DTOLoginRequest loginDTO, string role)
+        {
+            try
+            {
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtDetails.Key));
+                var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+                var claim = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, loginDTO.UserName),
+                    new Claim(ClaimTypes.Role, role)
+                };
+
+                var jwtSecurityToken = new JwtSecurityToken(
+                    issuer: _jwtDetails.Issuer,
+                    audience: _jwtDetails.Audience,
+                    claims: claim,
+                    expires: DateTime.Now.AddMinutes(10),
+                    signingCredentials: signinCredentials
+                    );
+
+                return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            }
+
+            catch (Exception e)
+            {
+                return e.Message;
+            }
         }
     }
 }

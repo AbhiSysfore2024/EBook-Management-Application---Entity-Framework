@@ -11,7 +11,7 @@ namespace Repositories.Interfaces
     {
         string Signup(DTOLoginRequest loginRequest);
         string RoleAssigned(DTOLoginRequest loginRequest);
-        //string GenerateJwtToken(DTOLoginRequest loginDTO, string role);
+        string GenerateJwtToken(DTOLoginRequest loginDTO, string role);
 
     }
 }
